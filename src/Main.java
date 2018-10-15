@@ -1,12 +1,9 @@
-import java.util.Scanner;
-
 //John Skinner
 //James Harper
 //Cullen Mollette
 //CSC415 Assignment 4: Create the Lexer
 
-
-
+import java.util.Scanner;
 
 public class Main {
 	Scanner sc;
