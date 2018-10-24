@@ -7,6 +7,8 @@ import java.security.InvalidParameterException;
 import java.util.Arrays;
 import java.util.Scanner;
 
+//import sun.tools.jstat.Identifier;
+
 public class Main {
 	Scanner sc;
 	int length=0;
@@ -37,7 +39,9 @@ public class Main {
 		lt.lex("123");
 		lt.lex("0123");
 		//Identifier Test
-		//to be implemented
+		lt.lex("msg");
+		lt.lex("i");
+		lt.lex("blue");
 		
 		//Comment Test
 		lt.lex("{hello}");
@@ -50,7 +54,11 @@ public class Main {
 		lt.lex("()");
 		System.out.println("-----------------");
 		//Complex Testing
-		lt.lex(" {Example Program #1} msg = \"Hi!\" num = 42 if : num ? 42 ( text : msg )");
+		lt.lex(" {Example Program #1} msg = \"Hi Mom!\" num=42 if : num ? 42 ( text : msg )");
+		System.out.println("-----------------");
+		lt.lex("redtextblue");
+		lt.lex("red42blue");
+		lt.lex("50=52");
 	}
 	
 	public void lex(String str) {
@@ -61,15 +69,15 @@ public class Main {
 			currentString = sc.next();
 			currentChar = currentString.charAt(0);
 			if(checkLexeme(currentChar)) {
-				defineLexeme(currentChar,sc);
+				defineLexeme(currentChar);
 			}else if(checkComment(currentChar)) {
 				defineComment(currentString,sc); 
 			}else if(checkString(currentChar)) {
 				defineString(currentString,sc);
 			}else if(checkNumeric(currentChar)) {
-				defineNumeric(currentString,sc);
+				defineNumeric(currentString);
 			}else {
-				defineIdentifier(currentString,sc);
+				defineIdentifier(currentString);
 			}
 		
 		}
@@ -86,8 +94,8 @@ public class Main {
 		
 		//throw new UnsupportedOperationException();
 	}
-	private void print(char lexeme, String descriptor) {
-		System.out.printf("%-10s %-10s\n", lexeme, descriptor);
+	private void print(char output, String descriptor) {
+		System.out.printf("%-10s %-10s\n", output, descriptor);
 		//throw new UnsupportedOperationException();
 
 	}
@@ -102,51 +110,40 @@ public class Main {
 	
 	private Boolean checkLexeme(char c){
 		//Check if c is equal to any of the lexeme
-		
-		for(int i=0; i<lexArray.length; i++)
-		{
-			if(c == lexArray[i])
-			{
-				return true;
-			}
-		}
-		return false;
+		return containsChar(lexArray,c);
 		//throw new UnsupportedOperationException();
 	}
 	//Only true if the current is a opening string "
 	//define string will close the string and print
 	private Boolean checkComment(char c) {
 		//Look for e char equals method
-		if(c == '{') 
-			return true;
-		else
-			return false;
+		return c == '{';
 	}
 	//Only true if the current is a [
 	//Define method will close and print
 	private Boolean checkString(char c)
 	{
 		//check if string
-		if(c == '\"') 
-			return true;
-		else
-			return false;
+		return c == '\"';
 		//throw new UnsupportedOperationException();
 	}
 	//Checks if c is equal to 0-9
 	private Boolean checkNumeric(char c) {
-		return Character.isDigit(c);
+		return containsChar(numericArray, c);
 		//throw new UnsupportedOperationException();
 	}
 	
 	//Define methods
 	//this is where we return the definition string to be printed
 	//Will take a char or String and print the definition
-	private void defineKeyword(String s, Scanner sc)
+	private void defineKeyword(String s)
 	{
-		throw new UnsupportedOperationException();
+		print(s,"Keyword");
+		//May not need this method
+			
+		
 	}
-	private void defineLexeme(char c, Scanner sc){
+	private void defineLexeme(char c){
 		//Return the description of Lexeme
 		//Switch statement to decide?
 		switch(c)
@@ -184,6 +181,7 @@ public class Main {
 		StringBuilder strBuild = new StringBuilder("\"");
 		boolean endStringFound = false;
 		String nextString;
+		//System.out.println(s + " S Test");
 		//Checking s and building a string
 		//Starts at 1 because we already have the first \"
 		for(int i=1; i<s.length(); i++)
@@ -204,7 +202,9 @@ public class Main {
 		}
 		while(!endStringFound)
 		{
+			strBuild.append(" ");
 			nextString = sc.next();
+			//System.out.println(sc.next() + " S Test");
 			for(int i=0; i<nextString.length(); i++)
 			{
 				 if(nextString.charAt(i) == '\"')
@@ -215,7 +215,7 @@ public class Main {
 				 }
 				 else
 				 {
-					 strBuild.append(s.charAt(i));
+					 strBuild.append(nextString.charAt(i));
 					
 				 }
 				
@@ -251,7 +251,7 @@ public class Main {
 			for(int i=0; i<nextString.length(); i++){
 				 if(nextString.charAt(i) == '}') {
 					 commentBuild.append("}");
-					 print(commentBuild.toString(), "String");
+					 print(commentBuild.toString(), "Comment");
 					 endCommentFound = true;
 				 }else{
 					 commentBuild.append(s.charAt(i));							
@@ -263,7 +263,7 @@ public class Main {
 	//takes the first number, if 0 it prints
 	//otherwise it loops until it finds a non number
 	//then prints the number as a string NO NEED TO MAKE IT AN INT
-	private void defineNumeric(String s, Scanner sc) {
+	private void defineNumeric(String s) {
 		StringBuilder strBuild = new StringBuilder();
 		for(int i=0; i<s.length();i++)
 		{
@@ -280,7 +280,7 @@ public class Main {
 			}
 			else
 			{
-				throw new InvalidParameterException("A NON NUMBER IN MY NUMERIC LITERAL??");
+				//defineIdentifier(s);
 			}
 		}
 		//if(s.charAt(0) != '0')
@@ -295,12 +295,60 @@ public class Main {
 	//Need to work on the logic for this.
 	//It may need to continue to loop through checking for Lexemes
 	//Any Ideas?
-	private void defineIdentifier(String s, Scanner sc) {
+	private void defineIdentifier(String s) {
 		//Will only check if full string is a keyword
 		//Still need to check within the class
 		if(containsString(keywordArray, s))
 		{
-			defineKeyword(s,sc);
+			defineKeyword(s);
+		}else{
+			boolean valid = false;
+			StringBuilder identifierBuild = new StringBuilder("");
+			for(int i=0; i<s.length();i++)
+			{
+				valid = false;
+				if(containsChar(lexArray,s.charAt(i)))
+				{
+					if(containsString(keywordArray, identifierBuild.toString())){
+						defineKeyword(identifierBuild.toString());
+					}else{
+						print(identifierBuild.toString(), "identifier?");
+					}
+					defineLexeme(s.charAt(i));
+					identifierBuild = new StringBuilder(s.charAt(i+1));//Need to Test logic
+				}else if(!containsChar(identifierArray,s.charAt(i)) 
+				&& !containsChar(numericArray, s.charAt(i)))
+				{
+					
+					print(identifierBuild.toString(), "**Error**");
+				}else if(containsString(keywordArray,identifierBuild.toString()))
+				{
+					
+					defineKeyword(identifierBuild.toString());
+					identifierBuild = new StringBuilder("");
+				}else if(containsChar(numericArray, s.charAt(i)))
+				{
+					
+					int x = i;
+					while(x<s.length() && containsChar(numericArray, s.charAt(x)) )
+					{
+						identifierBuild.append(s.charAt(x));
+						x++;
+					}
+					defineNumeric(identifierBuild.toString());
+					identifierBuild = new StringBuilder();
+					i = x;
+				}else{
+					valid = true;
+					identifierBuild.append(s.charAt(i));
+				}
+				
+			}
+			
+			if(valid){
+				print(s,"Identifier");
+			}
+				
 		}
 		
 		
