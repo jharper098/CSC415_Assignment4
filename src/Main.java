@@ -60,7 +60,7 @@ public class Main {
 		lt.lex("red42blue");
 		lt.lex("50=52");
 		System.out.println("-----------------");
-		lt.lex("3f4as3#@$");
+		lt.lex("12ab3c!@%#");
 	}
 	
 	public void lex(String str) {
@@ -171,7 +171,7 @@ public class Main {
 			break;
 			case ')': print(c,"Close Parenthesis");
 			break;
-			default: print(c,"**Error**");
+			default: print(c,"**Error: Invalid Character**");
 		
 		}
 		
@@ -213,7 +213,7 @@ public class Main {
 				 if(nextString.charAt(i) == '\"')
 				 {
 					 strBuild.append("\"");
-					 print(strBuild.toString(), "string literal");
+					 print(strBuild.toString(), "String Literal");
 					 endStringFound = true;
 				 }
 				 else
@@ -291,6 +291,7 @@ public class Main {
 				strBuild = new StringBuilder();
 				defineIdentifier(s.substring(i));
 				identifierfound = true;
+				break;
 			}
 		}
 		if(!strBuild.toString().equals("")&&!identifierfound)
@@ -308,6 +309,7 @@ public class Main {
 	private void defineIdentifier(String s) {
 		//Will only check if full string is a keyword
 		//Still need to check within the class
+		//System.out.println(s);
 		if(containsString(keywordArray, s))
 		{
 			defineKeyword(s);
@@ -334,8 +336,9 @@ public class Main {
 				&& !containsChar(numericArray, s.charAt(i)))
 				{
 					identifierBuild.append(s.charAt(i));
-					print(identifierBuild.toString(), "*Error*");
+					print(identifierBuild.toString(), "**Error: Ivalid Character**");
 					identifierBuild = new StringBuilder();
+					
 				}else if(containsString(keywordArray,identifierBuild.toString()))
 				{
 					
@@ -343,8 +346,6 @@ public class Main {
 					identifierBuild = new StringBuilder("");
 				}else if(containsChar(numericArray, s.charAt(i)))
 				{
-					//defineNumeric(s.substring(i));
-					
 					int x = i;
 					
 					if(containsString(keywordArray, identifierBuild.toString())){
@@ -363,7 +364,6 @@ public class Main {
 					}
 					if(!identifierBuild.toString().equals(""))
 					{
-						//defineNumeric(identifierBuild.toString());
 						print(identifierBuild.toString(), "Numeric Literal");
 					}
 					identifierBuild = new StringBuilder();
