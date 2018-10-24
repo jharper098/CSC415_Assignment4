@@ -336,7 +336,7 @@ public class Main {
 				&& !containsChar(numericArray, s.charAt(i)))
 				{
 					identifierBuild.append(s.charAt(i));
-					print(identifierBuild.toString(), "**Error: Ivalid Character**");
+					print(identifierBuild.toString(), "**Error: Invalid Character**");
 					identifierBuild = new StringBuilder();
 					
 				}else if(containsString(keywordArray,identifierBuild.toString()))
