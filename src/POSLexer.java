@@ -3,26 +3,63 @@
 //Cullen Mollette
 //CSC415 Assignment 4: Create the Lexer
 
-import java.security.InvalidParameterException;
-import java.util.Arrays;
+//import java.security.InvalidParameterException;
+//import java.util.Arrays;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.Scanner;
 
 //import sun.tools.jstat.Identifier;
-
-public class Main {
+//Needs to be renamed but w/e
+public class POSLexer {
 	Scanner sc;
 	int length=0;
 	String currentString;
 	char currentChar;
-	char[] lexArray = new char[] {'+', '=','?', '!', '<','>','-',':',')','('};
-	char[] identifierArray = new char[] {'a', 'b','c', 'd', 'e','f','g','h','i','j','k','l','m','n',
+	char[] lexArray = new char[] {'+', '=','?', '!', '<','>','-',':','(',')'};
+	char[] identifierArray = new char[] {'a','b','c','d','e','f','g','h','i','j','k','l','m','n',
 			'o','p','q','r','s','t','u','v','w','x','y','z','A','B','C','D','E','F','G','H','I','J',
-			'K','L','M','N' ,'O','P','Q','R','S','T','U','V','W','X','Y','Z','_'};
+			'K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','_'};
 	char[] numericArray = new char[] {'0','1','2','3','4','5','6','7','8','9'};
-	String[] keywordArray = new String[] {"text", "if","loop"};
-	public static void main(String[] args) {
+	String[] keywordArray = new String[] { "text", "if", "loop" };
+	public static void main(String[] args) throws FileNotFoundException {
+		POSLexer lt = new POSLexer();
+		StringBuilder lexArgs = new StringBuilder();
+		
+		
+		if(args.length != 0){
+			//0=L 1=E 2=X 3=( 4="   5 through (length-2) = String argument (length-1)=" (length)= )
+			//lex("data")
+			for(int x = 0; x<3; x++)
+			{
+				lexArgs.append(args[0].charAt(x));
+			}
+			if(lexArgs.toString().equals("lex"))
+			{	
+				lt.lex(args[1]);
+			}else{
+				String filename = args[0];
+				StringBuilder input=new StringBuilder();
+				Scanner scanner = new Scanner(new File(filename));
+				scanner.useDelimiter(" ");
+				while(scanner.hasNext()){
+					input.append(scanner.next());
+					input.append(" ");
+				}
+				scanner.close();
+				
+				lt.lex(input.toString());
+				}
+			}else{
+				lt.test();
+			
+		}
+		
+		
+	}
+	public void test(){
 		//Used for initial testing
-		Main lt = new Main();
+		POSLexer lt = new POSLexer();
 		
 		//Keyword Test
 		lt.lex("text");
@@ -39,6 +76,7 @@ public class Main {
 		lt.lex("1203");
 		lt.lex("0123");
 		//Identifier Test
+		System.out.println("-----------------");
 		lt.lex("msg");
 		lt.lex("i");
 		lt.lex("blue");
@@ -48,10 +86,17 @@ public class Main {
 		lt.lex("{}");
 		System.out.println("-----------------");
 		//Operator & Separator Tests
+		lt.lex("+");
 		lt.lex("=");
 		lt.lex("?");
+		lt.lex("!");
+		lt.lex("<");
+		lt.lex(">");
+		lt.lex("-");
+		lt.lex(":");
 		lt.lex("(");
-		lt.lex("()");
+		lt.lex(")");
+		lt.lex("(+");
 		System.out.println("-----------------");
 		//Complex Testing
 		lt.lex(" {Example Program #1} msg = \"Hi Mom!\" num=42 if : num ? 42 ( text : msg )");
@@ -60,25 +105,25 @@ public class Main {
 		lt.lex("red42blue");
 		lt.lex("50=52");
 		System.out.println("-----------------");
-		lt.lex("12ab3c!@%#");
+		lt.lex("1@2ab3c!@%#");
+		lt.lex("*1@2ab3c!@%#");
 	}
-	
 	public void lex(String str) {
-		
+		str = str.replaceAll("\"", "\\\"");
+		str = str.replace("\n", " ");
 		sc = new Scanner(str);
 		while(sc.hasNext())
 		{
-			currentString = sc.next();
-			
+			currentString = sc.next();			
 			for(int i = 0; i<currentString.length();i++){
-				currentChar = currentString.charAt(i);
+				currentChar = currentString.charAt(i);					
 				if(checkLexeme(currentChar)) {
 					defineLexeme(currentChar);
 				}else if(checkComment(currentChar)) {
-					defineComment(currentString,sc); 
+					defineComment(currentString); 
 					break;
 				}else if(checkString(currentChar)) {
-					defineString(currentString,sc);
+					defineString(currentString);
 					break;
 				}else if(checkNumeric(currentChar)) {
 					defineNumeric(currentString);
@@ -93,15 +138,15 @@ public class Main {
 		//throw new UnsupportedOperationException();
 	}
 	
-	private void print(char output, String descriptor) {
-		System.out.printf("%-10s %-10s\n", output, descriptor);
+	private void printChar(char output, String descriptor) {
+		System.out.printf("%-30s %-10s\n", output, descriptor);
 		//throw new UnsupportedOperationException();
 
 	}
-	private void print(String output, String descriptor) {
+	private void printString(String output, String descriptor) {
 		if(!output.equals(""))
 		{
-			System.out.printf("%-10s %-10s\n", output, descriptor);
+			System.out.printf("%-30s %-10s\n", output, descriptor);
 		}
 		
 		//throw new UnsupportedOperationException();
@@ -141,7 +186,7 @@ public class Main {
 	//Will take a char or String and print the definition
 	private void defineKeyword(String s)
 	{
-		print(s,"Keyword");
+		printString(s,"Keyword");
 		//May not need this method
 			
 		
@@ -151,27 +196,27 @@ public class Main {
 		//Switch statement to decide?
 		switch(c)
 		{
-			case '+': print(c,"Add/Concatenate");
+			case '+': printChar(c,"Add/Concatenate");
 			break;
-			case '=': print(c,"Assignment");
+			case '=': printChar(c,"Assignment");
 			break;
-			case '?': print(c,"Is Equal To");
+			case '?': printChar(c,"Is Equal To");
 			break;
-			case '!': print(c,"Is Not Equal To");
+			case '!': printChar(c,"Is Not Equal To");
 			break;
-			case '<': print(c,"Less Than");
+			case '<': printChar(c,"Less Than");
 			break;
-			case '>': print(c,"Greater Than");
+			case '>': printChar(c,"Greater Than");
 			break;
-			case '-': print(c,"Negation");
+			case '-': printChar(c,"Negation");
 			break;
-			case ':': print(c,"Colon");
+			case ':': printChar(c,"Colon");
 			break;
-			case '(': print(c,"Open Parenthesis");
+			case '(': printChar(c,"Open Parenthesis");
 			break;
-			case ')': print(c,"Close Parenthesis");
+			case ')': printChar(c,"Close Parenthesis");
 			break;
-			default: print(c,"**Error: Invalid Character**");
+			default: printChar(c,"**Error: Invalid Character**");
 		
 		}
 		
@@ -179,12 +224,11 @@ public class Main {
 	}
 	//It takes the first " and then loops until the closing "
 	//Check each token for " stop and print when found
-	private void defineString(String s, Scanner sc)	{
+	private void defineString(String s)	{
 		//Starts with the quotes in it
 		StringBuilder strBuild = new StringBuilder("\"");
 		boolean endStringFound = false;
 		String nextString;
-		//System.out.println(s + " S Test");
 		//Checking s and building a string
 		//Starts at 1 because we already have the first \"
 		for(int i=1; i<s.length(); i++)
@@ -193,7 +237,7 @@ public class Main {
 			 if(s.charAt(i) == '\"')
 			 {
 				 strBuild.append("\"");
-				 print(strBuild.toString(), "String Literal");
+				 printString(strBuild.toString(), "String Literal");
 				 endStringFound = true;
 			 }
 			 else
@@ -207,13 +251,12 @@ public class Main {
 		{
 			strBuild.append(" ");
 			nextString = sc.next();
-			//System.out.println(sc.next() + " S Test");
 			for(int i=0; i<nextString.length(); i++)
 			{
 				 if(nextString.charAt(i) == '\"')
 				 {
 					 strBuild.append("\"");
-					 print(strBuild.toString(), "String Literal");
+					 printString(strBuild.toString(), "String Literal");
 					 endStringFound = true;
 				 }
 				 else
@@ -232,7 +275,7 @@ public class Main {
 	}
 	//It takes the [ and loops until ]
 	//Check each token for [ stop and print when found
-	private void defineComment(String s, Scanner sc) {
+	private void defineComment(String s) {
 		//Starts with the quotes in it
 		StringBuilder commentBuild = new StringBuilder("{");
 		boolean endCommentFound = false;
@@ -243,7 +286,7 @@ public class Main {
 			//checks for final comment
 			 if(s.charAt(i) == '}'){
 				 commentBuild.append("}");
-				 print(commentBuild.toString(), "Comment");
+				 printString(commentBuild.toString(), "Comment");
 				 endCommentFound = true;
 			 }else{
 				 commentBuild.append(s.charAt(i));
@@ -255,7 +298,7 @@ public class Main {
 			for(int i=0; i<nextString.length(); i++){
 				 if(nextString.charAt(i) == '}') {
 					 commentBuild.append("}");
-					 print(commentBuild.toString(), "Comment");
+					 printString(commentBuild.toString(), "Comment");
 					 endCommentFound = true;
 				 }else{
 					 commentBuild.append(nextString.charAt(i));							
@@ -276,7 +319,7 @@ public class Main {
 			{
 				if(s.charAt(i) == '0' && strBuild.toString().equals("")) {
 					strBuild.append(s.charAt(i));
-					print(strBuild.toString(),"Numeric literal");
+					printString(strBuild.toString(),"Numeric literal");
 					//Clearing in case we need to make multiple numeric literals in one go
 					strBuild = new StringBuilder();
 				}else{
@@ -286,7 +329,7 @@ public class Main {
 			{
 				if(!strBuild.toString().equals(""))
 				{
-					print(strBuild.toString(), "Numeric Literal");
+					printString(strBuild.toString(), "Numeric Literal");
 				}
 				strBuild = new StringBuilder();
 				defineIdentifier(s.substring(i));
@@ -296,7 +339,7 @@ public class Main {
 		}
 		if(!strBuild.toString().equals("")&&!identifierfound)
 		{
-			print(strBuild.toString(), "Numeric Literal");
+			printString(strBuild.toString(), "Numeric Literal");
 		}
 		
 		
@@ -309,7 +352,6 @@ public class Main {
 	private void defineIdentifier(String s) {
 		//Will only check if full string is a keyword
 		//Still need to check within the class
-		//System.out.println(s);
 		if(containsString(keywordArray, s))
 		{
 			defineKeyword(s);
@@ -319,6 +361,7 @@ public class Main {
 			for(int i=0; i<s.length();i++)
 			{
 				valid = false;
+				//Makes sure first element is not a lexeme
 				if(containsChar(lexArray,s.charAt(i)))
 				{
 					if(containsString(keywordArray, identifierBuild.toString())){
@@ -326,17 +369,17 @@ public class Main {
 					}else{
 						if(!identifierBuild.toString().equals(""))
 						{
-							print(identifierBuild.toString(), "Identifier");
+							printString(identifierBuild.toString(), "Identifier");
 						}
 						
 					}
 					defineLexeme(s.charAt(i));
-					identifierBuild = new StringBuilder(s.charAt(i+1));//Need to Test logic
+					identifierBuild = new StringBuilder();//Need to Test logic
 				}else if(!containsChar(identifierArray,s.charAt(i)) 
 				&& !containsChar(numericArray, s.charAt(i)))
 				{
-					identifierBuild.append(s.charAt(i));
-					print(identifierBuild.toString(), "**Error: Invalid Character**");
+					defineIdentifier(identifierBuild.toString());
+					printChar(s.charAt(i), "**Error: Invalid Character**");
 					identifierBuild = new StringBuilder();
 					
 				}else if(containsString(keywordArray,identifierBuild.toString()))
@@ -353,7 +396,7 @@ public class Main {
 					}else{
 						if(!identifierBuild.toString().equals(""))
 						{
-							print(identifierBuild.toString(), "Identifier");
+							printString(identifierBuild.toString(), "Identifier");
 						}	
 					}
 					identifierBuild = new StringBuilder();
@@ -364,7 +407,7 @@ public class Main {
 					}
 					if(!identifierBuild.toString().equals(""))
 					{
-						print(identifierBuild.toString(), "Numeric Literal");
+						printString(identifierBuild.toString(), "Numeric Literal");
 					}
 					identifierBuild = new StringBuilder();
 					i = x-1;
@@ -382,7 +425,7 @@ public class Main {
 				}else{
 					if(!identifierBuild.toString().equals(""))
 					{
-						print(identifierBuild.toString(), "Identifier");
+						printString(identifierBuild.toString(), "Identifier");
 					}	
 				}
 				
@@ -413,7 +456,7 @@ public class Main {
 		boolean result = false;
 
         for(String index : array){
-            if(index == c){
+            if(index.equals(c)){
                 result = true;
                 break;
             }

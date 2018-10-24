@@ -4,28 +4,28 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-
+        
     {
         "type": "java",
-        "name": "Debug (Launch)",
+        "name": "Debug No Args(Launch)",
         "request": "launch",
         "cwd": "${workspaceFolder}",
         "console": "internalConsole",
         "stopOnEntry": false,
-        "mainClass": "Main",
+        "mainClass": "POSLexer",
         "projectName": "POSLexer",
         "args": ""
     },
     {
         "type": "java",
-        "name": "Debug (Launch)",
+        "name": "Debug Args(Launch)",
         "request": "launch",
         "cwd": "${workspaceFolder}",
         "console": "internalConsole",
         "stopOnEntry": false,
-        "mainClass": "Main",
+        "mainClass": "POSLexer",
         "projectName": "POSLexer",
-        "args": ""
+        "args": "C:\\Users\\Cattibre\\Documents\\School\\Web\\CSC415_Assignment4\\bin\\Test1.txt"
     },
        
     
