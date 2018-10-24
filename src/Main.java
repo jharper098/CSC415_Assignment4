@@ -16,7 +16,7 @@ public class Main {
 	char currentChar;
 	char[] lexArray = new char[] {'+', '=','?', '!', '<','>','-',':',')','('};
 	char[] identifierArray = new char[] {'a', 'b','c', 'd', 'e','f','g','h','i','j','k','l','m','n',
-			'o','p','q','r','s','t','u','v','w','x','y','A','B','C','D','E','F','G','H','I','J',
+			'o','p','q','r','s','t','u','v','w','x','y','z','A','B','C','D','E','F','G','H','I','J',
 			'K','L','M','N' ,'O','P','Q','R','S','T','U','V','W','X','Y','Z','_'};
 	char[] numericArray = new char[] {'0','1','2','3','4','5','6','7','8','9'};
 	String[] keywordArray = new String[] {"text", "if","loop"};
@@ -28,25 +28,25 @@ public class Main {
 		lt.lex("text");
 		lt.lex("if");
 		lt.lex("loop");
-		
+		System.out.println("-----------------");
 		//String Tests
 		lt.lex("\"Hello\"");
 		lt.lex("\"\"");
-		
+		System.out.println("-----------------");
 		//Numeric Tests
 		lt.lex("0");
 		lt.lex("1");
-		lt.lex("123");
+		lt.lex("1203");
 		lt.lex("0123");
 		//Identifier Test
 		lt.lex("msg");
 		lt.lex("i");
 		lt.lex("blue");
-		
+		System.out.println("-----------------");
 		//Comment Test
 		lt.lex("{hello}");
 		lt.lex("{}");
-
+		System.out.println("-----------------");
 		//Operator & Separator Tests
 		lt.lex("=");
 		lt.lex("?");
@@ -59,48 +59,51 @@ public class Main {
 		lt.lex("redtextblue");
 		lt.lex("red42blue");
 		lt.lex("50=52");
+		System.out.println("-----------------");
+		lt.lex("3f4as3#@$");
 	}
 	
 	public void lex(String str) {
-		setLength(str);
+		
 		sc = new Scanner(str);
 		while(sc.hasNext())
 		{
 			currentString = sc.next();
-			currentChar = currentString.charAt(0);
-			if(checkLexeme(currentChar)) {
-				defineLexeme(currentChar);
-			}else if(checkComment(currentChar)) {
-				defineComment(currentString,sc); 
-			}else if(checkString(currentChar)) {
-				defineString(currentString,sc);
-			}else if(checkNumeric(currentChar)) {
-				defineNumeric(currentString);
-			}else {
-				defineIdentifier(currentString);
+			
+			for(int i = 0; i<currentString.length();i++){
+				currentChar = currentString.charAt(i);
+				if(checkLexeme(currentChar)) {
+					defineLexeme(currentChar);
+				}else if(checkComment(currentChar)) {
+					defineComment(currentString,sc); 
+					break;
+				}else if(checkString(currentChar)) {
+					defineString(currentString,sc);
+					break;
+				}else if(checkNumeric(currentChar)) {
+					defineNumeric(currentString);
+					break;
+				}else {
+					defineIdentifier(currentString);
+					break;
+				}
+				
 			}
-		
 		}
-		
 		//throw new UnsupportedOperationException();
 	}
-	private void setLength(String str){
-		sc = new Scanner(str);
-		while(sc.hasNext())
-		{
-			sc.next();
-			length++;
-		}
-		
-		//throw new UnsupportedOperationException();
-	}
+	
 	private void print(char output, String descriptor) {
 		System.out.printf("%-10s %-10s\n", output, descriptor);
 		//throw new UnsupportedOperationException();
 
 	}
 	private void print(String output, String descriptor) {
-		System.out.printf("%-10s %-10s\n", output, descriptor);
+		if(!output.equals(""))
+		{
+			System.out.printf("%-10s %-10s\n", output, descriptor);
+		}
+		
 		//throw new UnsupportedOperationException();
 	}
 	
@@ -148,25 +151,25 @@ public class Main {
 		//Switch statement to decide?
 		switch(c)
 		{
-			case '+': print(c,"add/concatenate");
+			case '+': print(c,"Add/Concatenate");
 			break;
-			case '=': print(c,"assignment");
+			case '=': print(c,"Assignment");
 			break;
-			case '?': print(c,"is equal to");
+			case '?': print(c,"Is Equal To");
 			break;
-			case '!': print(c,"is not equal to");
+			case '!': print(c,"Is Not Equal To");
 			break;
-			case '<': print(c,"less than");
+			case '<': print(c,"Less Than");
 			break;
-			case '>': print(c,"greater than");
+			case '>': print(c,"Greater Than");
 			break;
-			case '-': print(c,"negation");
+			case '-': print(c,"Negation");
 			break;
-			case ':': print(c,"colon");
+			case ':': print(c,"Colon");
 			break;
-			case '(': print(c,"open parenthesis");
+			case '(': print(c,"Open Parenthesis");
 			break;
-			case ')': print(c,"close parenthesis");
+			case ')': print(c,"Close Parenthesis");
 			break;
 			default: print(c,"**Error**");
 		
@@ -190,7 +193,7 @@ public class Main {
 			 if(s.charAt(i) == '\"')
 			 {
 				 strBuild.append("\"");
-				 print(strBuild.toString(), "string literal");
+				 print(strBuild.toString(), "String Literal");
 				 endStringFound = true;
 			 }
 			 else
@@ -247,6 +250,7 @@ public class Main {
 			 }
 		}
 		while(!endCommentFound){
+			commentBuild.append(" ");
 			nextString = sc.next();
 			for(int i=0; i<nextString.length(); i++){
 				 if(nextString.charAt(i) == '}') {
@@ -254,7 +258,7 @@ public class Main {
 					 print(commentBuild.toString(), "Comment");
 					 endCommentFound = true;
 				 }else{
-					 commentBuild.append(s.charAt(i));							
+					 commentBuild.append(nextString.charAt(i));							
 				 }
 			}					
 		}
@@ -265,28 +269,34 @@ public class Main {
 	//then prints the number as a string NO NEED TO MAKE IT AN INT
 	private void defineNumeric(String s) {
 		StringBuilder strBuild = new StringBuilder();
+		boolean identifierfound = false;
 		for(int i=0; i<s.length();i++)
 		{
 			if(containsChar(numericArray,s.charAt(i)))
 			{
-				if(s.charAt(i) == '0') {
+				if(s.charAt(i) == '0' && strBuild.toString().equals("")) {
 					strBuild.append(s.charAt(i));
-					print(strBuild.toString(),"numeric literal");
+					print(strBuild.toString(),"Numeric literal");
 					//Clearing in case we need to make multiple numeric literals in one go
 					strBuild = new StringBuilder();
 				}else{
 					strBuild.append(s.charAt(i));
 				}
-			}
-			else
+			}else
 			{
-				//defineIdentifier(s);
+				if(!strBuild.toString().equals(""))
+				{
+					print(strBuild.toString(), "Numeric Literal");
+				}
+				strBuild = new StringBuilder();
+				defineIdentifier(s.substring(i));
+				identifierfound = true;
 			}
 		}
-		//if(s.charAt(0) != '0')
-		//{
-		print(strBuild.toString(), "numeric Literal");
-		//}
+		if(!strBuild.toString().equals("")&&!identifierfound)
+		{
+			print(strBuild.toString(), "Numeric Literal");
+		}
 		
 		
 		//throw new UnsupportedOperationException();
@@ -312,15 +322,20 @@ public class Main {
 					if(containsString(keywordArray, identifierBuild.toString())){
 						defineKeyword(identifierBuild.toString());
 					}else{
-						print(identifierBuild.toString(), "identifier?");
+						if(!identifierBuild.toString().equals(""))
+						{
+							print(identifierBuild.toString(), "Identifier");
+						}
+						
 					}
 					defineLexeme(s.charAt(i));
 					identifierBuild = new StringBuilder(s.charAt(i+1));//Need to Test logic
 				}else if(!containsChar(identifierArray,s.charAt(i)) 
 				&& !containsChar(numericArray, s.charAt(i)))
 				{
-					
-					print(identifierBuild.toString(), "**Error**");
+					identifierBuild.append(s.charAt(i));
+					print(identifierBuild.toString(), "*Error*");
+					identifierBuild = new StringBuilder();
 				}else if(containsString(keywordArray,identifierBuild.toString()))
 				{
 					
@@ -328,16 +343,32 @@ public class Main {
 					identifierBuild = new StringBuilder("");
 				}else if(containsChar(numericArray, s.charAt(i)))
 				{
+					//defineNumeric(s.substring(i));
 					
 					int x = i;
+					
+					if(containsString(keywordArray, identifierBuild.toString())){
+						defineKeyword(identifierBuild.toString());
+					}else{
+						if(!identifierBuild.toString().equals(""))
+						{
+							print(identifierBuild.toString(), "Identifier");
+						}	
+					}
+					identifierBuild = new StringBuilder();
 					while(x<s.length() && containsChar(numericArray, s.charAt(x)) )
 					{
 						identifierBuild.append(s.charAt(x));
 						x++;
 					}
-					defineNumeric(identifierBuild.toString());
+					if(!identifierBuild.toString().equals(""))
+					{
+						//defineNumeric(identifierBuild.toString());
+						print(identifierBuild.toString(), "Numeric Literal");
+					}
 					identifierBuild = new StringBuilder();
-					i = x;
+					i = x-1;
+					
 				}else{
 					valid = true;
 					identifierBuild.append(s.charAt(i));
@@ -346,7 +377,15 @@ public class Main {
 			}
 			
 			if(valid){
-				print(s,"Identifier");
+				if(containsString(keywordArray, identifierBuild.toString())){
+					defineKeyword(identifierBuild.toString());
+				}else{
+					if(!identifierBuild.toString().equals(""))
+					{
+						print(identifierBuild.toString(), "Identifier");
+					}	
+				}
+				
 			}
 				
 		}
