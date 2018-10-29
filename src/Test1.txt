@@ -1,0 +1,13 @@
+{Example Program #1}
+    msg = "Hi!"
+    num = 42
+    if: num ? 42
+    (
+        text: msg
+    )
+    {abc"defg"hij"}
+{nes{commentted}
+msg4ab
+DC$#abc Q%T$#$%T#TQ T$T@
+
+
