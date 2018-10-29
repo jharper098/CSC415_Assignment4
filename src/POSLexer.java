@@ -31,63 +31,101 @@ public class POSLexer {
 			if(lexArgs.toString().equals("lex"))
 			{	
 				//Auto Excludes the surrounding string delimiters
-				lt.lex(args[1]);
+				lt.lex();
 			}else{
 				//Not empy arg but also not lex means filename. 
 				//main throws FileNotFound for screwups
 				String filename = args[0];
 				StringBuilder input=new StringBuilder();
 				Scanner scanner = new Scanner(new File(filename));
+				
 				scanner.useDelimiter(" ");
 				while(scanner.hasNext()){
 					input.append(scanner.next());
 					input.append(" ");
 				}
+				lt.setScanner(scanner);
 				scanner.close();
 				
-				lt.lex(input.toString());
-				}
-			}else{
-				//Enable to run tests and run the program with no arguments
-				lt.test();	
+			}
+				
+		}else{
+			//Enable to run tests and run the program with no arguments
+			lt.test();	
 		}
 		
 		
 	}
-	
+	public void setScanner(Scanner inputScanner)
+	{
+		this.sc = inputScanner;
+	}
 	//Lex function Takes a string of any size and returns the lexical analysis
-	public void lex(String str) {
+	//Needs to be able to be called 
+	public void lex() {
 		String currentString;
 		char currentChar;
+		String str = sc.next();
 		//Formatting
 		str = str.replaceAll("\"", "\\\"");
 		str = str.replace("\n", " ");
 		//Starting the loop
 		sc = new Scanner(str);
-		while(sc.hasNext())
-		{
-			//Checks for each kind of result and returns the correct definition
-			currentString = sc.next();			
-			for(int i = 0; i<currentString.length();i++){
-				currentChar = currentString.charAt(i);					
-				if(checkLexeme(currentChar)) {
-					defineLexeme(currentChar);
-				}else if(checkComment(currentChar)) {
-					defineComment(currentString); 
-					break;
-				}else if(checkString(currentChar)) {
-					defineString(currentString);
-					break;
-				}else if(checkNumeric(currentChar)) {
-					defineNumeric(currentString);
-					break;
-				}else {
-					defineIdentifier(currentString);
-					break;
-				}
-				
+		//Checks for each kind of result and returns the correct definition
+		currentString = sc.next();			
+		for(int i = 0; i<currentString.length();i++){
+			currentChar = currentString.charAt(i);					
+			if(checkLexeme(currentChar)) {
+				defineLexeme(currentChar);
+			}else if(checkComment(currentChar)) {
+				defineComment(currentString); 
+				break;
+			}else if(checkString(currentChar)) {
+				defineString(currentString);
+				break;
+			}else if(checkNumeric(currentChar)) {
+				defineNumeric(currentString);
+				break;
+			}else {
+				defineIdentifier(currentString);
+				break;
 			}
+			
 		}
+		
+		
+	}
+	public void lex(String str) {
+		String currentString;
+		char currentChar;
+		//String str = sc.next();
+		//Formatting
+		str = str.replaceAll("\"", "\\\"");
+		str = str.replace("\n", " ");
+		//Starting the loop
+		sc = new Scanner(str);
+		//Checks for each kind of result and returns the correct definition
+		currentString = sc.next();			
+		for(int i = 0; i<currentString.length();i++){
+			currentChar = currentString.charAt(i);					
+			if(checkLexeme(currentChar)) {
+				defineLexeme(currentChar);
+			}else if(checkComment(currentChar)) {
+				defineComment(currentString); 
+				break;
+			}else if(checkString(currentChar)) {
+				defineString(currentString);
+				break;
+			}else if(checkNumeric(currentChar)) {
+				defineNumeric(currentString);
+				break;
+			}else {
+				defineIdentifier(currentString);
+				break;
+			}
+			
+		}
+		
 		
 	}
 	
