@@ -35,8 +35,15 @@ public class POSLexer {
 			}else{
 				//Not empy arg but also not lex means filename. 
 				//main throws FileNotFound for screwups
-				String filename = args[0];
+				String filename;
 				StringBuilder input=new StringBuilder();
+				for(String s : args){
+					input.append(s);
+					input.append(" ");
+				}
+				filename = input.toString();
+				System.out.println(filename);
+				input = new StringBuilder();
 				Scanner scanner = new Scanner(new File(filename));
 				
 				scanner.useDelimiter(" ");
